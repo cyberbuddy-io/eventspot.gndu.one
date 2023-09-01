@@ -1,21 +1,57 @@
 import React, { useState } from 'react';
+import './AuthForm.css';
 import { Link } from 'react-router-dom';
-import './AuthForm.css'; // Use the same CSS file for styling
+import { auth, googleAuthProvider, signInWithPopup } from '../firebase-config';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
+
 
 const Signup = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [message, setMessage] = useState({ error: false, msg: "" });
 
-    const handleSignup = (e) => {
+    const HandleSignup = async (e) => {
         e.preventDefault();
-        console.log('Signing up with:', username, password);
-        // Add actual signup logic here
+        setMessage({ error: false, msg: "" });
+
+    if (username === "" || password === "") {
+        setMessage({ error: true, msg: "All fields are mandatory!" });
+        return;
+    }
+
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, username, password);
+        console.log('User signed up successfully:', userCredential.user);
+        alert('User signed up successfully!');
+
+        const db = getFirestore();
+        const userDocRef = doc(db, 'users', userCredential.user.uid);
+        await setDoc(userDocRef, {
+            username: username,
+            password: password,
+            // Any other user data you want to store
+        });
+        alert('User signed up successfully!');
+    } catch (error) {
+        console.error('Signup error:', error);
+        alert('Signup error. Please try again.');
+    }
+    };
+
+    const handleGoogleSignIn = async () => {
+        try {
+            await signInWithPopup(auth, googleAuthProvider);
+        } catch (error) {
+            console.error('Google sign-in error:', error);
+            alert('Google sign-in error. Please try again.');
+        }
     };
 
     return (
         <div className="auth-form-container">
         <h2 className="auth-form-title">Sign Up</h2>
-        <form onSubmit={handleSignup}>
+
             <div className="auth-form-group">
             <label htmlFor="username" className="auth-form-label">
                 Username
@@ -40,16 +76,15 @@ const Signup = () => {
                 onChange={(e) => setPassword(e.target.value)}
             />
             </div>
-            <button type="submit" className="auth-form-button">
+            <button className="auth-form-button" onClick={HandleSignup}>
             Sign Up
             </button>
             <p className="auth-form-text">
             Already have an account? <Link to="/login">Login</Link>
             </p>
-            <button className="auth-google-button">
-            Continue with Google
+            <button onClick={handleGoogleSignIn} className="auth-google-button">
+                Continue with Google
             </button>
-        </form>
         </div>
     );
 };
