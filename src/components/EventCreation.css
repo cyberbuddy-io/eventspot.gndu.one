@@ -1,7 +1,7 @@
 .event-creation-container {
-max-width: 800px;
-margin-top: 60px;
-margin-left: 350px;
+max-width: 600px;
+margin-top: 40px;
+margin-left: 500px;
 padding: 20px;
 background-color: #ffffff;
 box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -66,4 +66,9 @@ background-color: #0056b3;
 margin-top: 10px;
 font-size: 16px;
 color: #28a745;
+}
+.radio-label {
+    margin-right: 30px; /* Adjust the spacing between radio buttons */
+    cursor: pointer;
+    font-size: 20px; /* Adjust font size */
 }

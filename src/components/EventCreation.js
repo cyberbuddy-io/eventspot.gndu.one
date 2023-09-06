@@ -1,46 +1,57 @@
 import React, { useState } from 'react';
 import './EventCreation.css';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const EventCreation = () => {
     const [eventName, setEventName] = useState('');
     const [eventDescription, setEventDescription] = useState('');
     const [eventDateTime, setEventDateTime] = useState('');
-    const [eventImage, setEventImage] = useState('');
+    const [eventImage, setEventImage] = useState(null);
+    const [eventVenue, setEventVenue] = useState('');
+    const [eventMode, setEventMode] = useState('Online'); // Default mode is Online
     const [message, setMessage] = useState('');
-    const [createdEvent, setCreatedEvent] = useState(null);
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        setEventImage(file);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
             const db = getFirestore();
+            const storage = getStorage();
             const eventsCollection = collection(db, 'events');
 
-            // Add event data to Firestore
-            const docRef = await addDoc(eventsCollection, {
-                eventName,
-                eventDescription,
-                eventDateTime,
-                eventImage,
-            });
+            if (eventImage) {
+                const imageRef = ref(storage, 'eventImages/' + eventImage.name);
+                await uploadBytes(imageRef, eventImage);
 
-            setCreatedEvent({
-                id: docRef.id,
-                eventName,
-                eventDescription,
-                eventDateTime,
-                eventImage,
-            });
+                const imageUrl = await getDownloadURL(imageRef);
+
+                const newEvent = {
+                    eventName,
+                    eventDescription,
+                    eventDateTime,
+                    eventImage: imageUrl,
+                    venue: eventMode === 'Offline' ? eventVenue : '', // Store venue conditionally
+                    mode: eventMode, // Store event mode
+                };
+
+                const docRef = await addDoc(eventsCollection, newEvent);
+            }
 
             setEventName('');
             setEventDescription('');
             setEventDateTime('');
-            setEventImage('');
+            setEventImage(null);
+            setEventVenue('');
             setMessage('Event created successfully!');
         } catch (error) {
             console.error('Event creation error:', error);
-            setMessage('Event creation error. Please try again.');
+            setMessage(`Event creation error: ${error.message}`);
         }
     };
 
@@ -94,11 +105,50 @@ const EventCreation = () => {
                         type="file"
                         id="eventImage"
                         className="event-creation-input"
-                        value={eventImage}
-                        onChange={(e) => setEventImage(e.target.value)}
+                        onChange={handleImageChange}
                         required
                     />
                 </div>
+                <div className="event-creation-group">
+                    <label className="event-creation-label">Event Mode</label>
+                    <div>
+                        <input
+                            type="radio"
+                            id="onlineMode"
+                            name="eventMode"
+                            value="Online"
+                            checked={eventMode === 'Online'}
+                            onChange={() => setEventMode('Online')}
+                        />
+                        <label htmlFor="onlineMode">Online</label>
+                    </div>
+                    <div>
+                        <input
+                            type="radio"
+                            id="offlineMode"
+                            name="eventMode"
+                            value="Offline"
+                            checked={eventMode === 'Offline'}
+                            onChange={() => setEventMode('Offline')}
+                        />
+                        <label htmlFor="offlineMode">Offline</label>
+                    </div>
+                </div>
+                {eventMode === 'Offline' && ( // Show venue input conditionally
+                    <div className="event-creation-group">
+                        <label htmlFor="eventVenue" className="event-creation-label">
+                            Event Venue
+                        </label>
+                        <input
+                            type="text"
+                            id="eventVenue"
+                            className="event-creation-input"
+                            value={eventVenue}
+                            onChange={(e) => setEventVenue(e.target.value)}
+                            required
+                        />
+                    </div>
+                )}
                 <button type="submit" className="event-creation-button">
                     Create Event
                 </button>

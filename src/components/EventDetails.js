@@ -1,26 +1,50 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import './EventDetails.css';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
-const EventDetails = ({ events }) => {
+const EventDetails = () => {
     const { eventId } = useParams();
+    console.log(eventId);
+    const [event, setEvent] = useState(null);
 
-    // Find the selected event based on the eventId
-    const selectedEvent = events.find(event => event.link === eventId);
+    useEffect(() => {
+        async function fetchEvent() {
+            const db = getFirestore();
+            const eventRef = doc(db, 'events', eventId);
+            const eventDoc = await getDoc(eventRef);
+            if (eventDoc.exists()) {
+                setEvent(eventDoc.data());
+            } else {
+                console.log('Event not found');
+            }
+        }
 
-    if (!selectedEvent) {
-        return <div>Event not found</div>;
+        fetchEvent();
+    }, [eventId]);
+
+    const handleNotifyClick = () => {
+        // Implement the notification logic here, e.g., send a notification to the user.
+        alert('You will be notified about this event.');
+    };
+
+    if (!event) {
+        return <div>Event Not Found</div>;
     }
 
     return (
         <div className="event-details-container">
-        <img src={selectedEvent.imageUrl} alt={selectedEvent.title} className="event-details-image" />
-        <div className="event-details-content">
-            <h2>{selectedEvent.title}</h2>
-            <p>{selectedEvent.description}</p>
-            <p> Date: {selectedEvent.date}</p>
-            <p> Time: {selectedEvent.time}</p>
-        </div>
+            <img src={event.eventImage} alt={event.eventName} className="event-details-image" />
+            <div className="event-details-content">
+                <h2>Name: {event.eventName}</h2>
+                <p>Description: {event.eventDescription}</p>
+                <p>Date & Time: {event.eventDateTime}</p>
+                <p>Mode: {event.mode}</p>
+                <p>Venue: {event.venue}</p>
+                <button onClick={handleNotifyClick} className="notify-button">
+                    Notify
+                </button>
+            </div>
         </div>
     );
 };

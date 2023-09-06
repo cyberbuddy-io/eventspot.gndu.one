@@ -5,11 +5,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Login from './components/Login';
 import Signup from './components/Signup';
-import EventViewer from './components/EventViewer';
 import EventDetails from './components/EventDetails';
-import { events } from './components/eventsData';
 import EventCreation from './components/EventCreation';
-import EventList from './components/EventList';
+import EventViewer from './components/EventViewer';
 import { auth } from './firebase-config';
 
 function App() {
@@ -49,10 +47,9 @@ function App() {
         </nav>
         <Routes>
           <Route path="/" element={<EventViewer />} />
-          {/* <Route path="/" element={<EventList />} /> */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/event/:eventId" element={<EventDetails events={events} />} />
+          <Route path="/event/:eventId" element={<EventDetails/>} />
           <Route path="/create-event" element={<EventCreation />} />
         </Routes>
       </div>

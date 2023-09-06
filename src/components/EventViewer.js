@@ -1,18 +1,70 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import EventCard from './EventCard';
-import { events } from './eventsData';
+import styled from 'styled-components';
 
-const EventViewer = () => {
+// Define your styled components
+const CenteredContent = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+`;
+
+const EventViewerContainer = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-left: 80px;
+`;
+
+const EventCardContainer = styled.div`
+    flex: 0 0 calc(33.3333% - 60px); /* Adjust the width as needed */
+    /* Other styling for individual event cards */
+`;
+
+const StyledHeading = styled.h2`
+    font-size: 40px;
+    font-weight: bold;
+    color: #000;
+    text-align: center;
+    padding-top: 30px;
+`;
+
+const EventList = () => {
+    const [events, setEvents] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const db = getFirestore();
+            const eventsCollection = collection(db, 'events');
+            const querySnapshot = await getDocs(eventsCollection);
+
+            const eventData = [];
+            querySnapshot.forEach((doc) => {
+                eventData.push({ id: doc.id, ...doc.data() });
+            });
+
+            setEvents(eventData);
+        };
+
+        fetchData();
+    }, []);
+
     return (
-        <div className="container mt-5">
-        <h2>GNDU EVENTS LISTING</h2>
-        <div className="d-flex flex-wrap">
-            {events.map((event, index) => (
-            <EventCard key={index} event={event} events={events} />
-            ))}
-        </div>
-        </div>
+        <CenteredContent>
+            <StyledHeading>GNDU Event Listing</StyledHeading>
+            <EventViewerContainer>
+                {events.map((event) => (
+                    <EventCardContainer key={event.id}>
+                        <EventCard event={event} />
+                    </EventCardContainer>
+                ))}
+            </EventViewerContainer>
+        </CenteredContent>
     );
 };
 
-export default EventViewer;
+export default EventList;
