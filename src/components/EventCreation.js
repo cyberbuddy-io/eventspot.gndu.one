@@ -9,7 +9,8 @@ const EventCreation = () => {
     const [eventDateTime, setEventDateTime] = useState('');
     const [eventImage, setEventImage] = useState(null);
     const [eventVenue, setEventVenue] = useState('');
-    const [eventMode, setEventMode] = useState('Online'); // Default mode is Online
+    const [eventMode, setEventMode] = useState('Online');
+    const [onlineMeetLink, setOnlineMeetLink] = useState('');
     const [message, setMessage] = useState('');
 
     const handleImageChange = (e) => {
@@ -36,6 +37,7 @@ const EventCreation = () => {
                     eventDescription,
                     eventDateTime,
                     eventImage: imageUrl,
+                    onlineMeetLink: eventMode === 'Online' ? onlineMeetLink : '',
                     venue: eventMode === 'Offline' ? eventVenue : '', // Store venue conditionally
                     mode: eventMode, // Store event mode
                 };
@@ -47,6 +49,7 @@ const EventCreation = () => {
             setEventDescription('');
             setEventDateTime('');
             setEventImage(null);
+            setOnlineMeetLink('');
             setEventVenue('');
             setMessage('Event created successfully!');
         } catch (error) {
@@ -66,6 +69,7 @@ const EventCreation = () => {
                     <input
                         type="text"
                         id="eventName"
+                        placeholder='Enter event name'
                         className="event-creation-input"
                         value={eventName}
                         onChange={(e) => setEventName(e.target.value)}
@@ -78,6 +82,7 @@ const EventCreation = () => {
                     </label>
                     <textarea
                         id="eventDescription"
+                        placeholder='Enter event description'
                         className="event-creation-textarea"
                         value={eventDescription}
                         onChange={(e) => setEventDescription(e.target.value)}
@@ -134,6 +139,22 @@ const EventCreation = () => {
                         <label htmlFor="offlineMode">Offline</label>
                     </div>
                 </div>
+                {eventMode === 'Online' && ( // Show Online Meet Link input conditionally
+                    <div className="event-creation-group">
+                        <label htmlFor="onlineMeetLink" className="event-creation-label">
+                            Online Meet Link
+                        </label>
+                        <input
+                            type="text"
+                            id="onlineMeetLink"
+                            placeholder='Enter your online meet link here'
+                            className="event-creation-input"
+                            value={onlineMeetLink}
+                            onChange={(e) => setOnlineMeetLink(e.target.value)}
+                            required
+                        />
+                    </div>
+                )}
                 {eventMode === 'Offline' && ( // Show venue input conditionally
                     <div className="event-creation-group">
                         <label htmlFor="eventVenue" className="event-creation-label">

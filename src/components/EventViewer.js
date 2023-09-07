@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, query, orderBy } from 'firebase/firestore';
 import EventCard from './EventCard';
 import styled from 'styled-components';
 
@@ -40,6 +40,7 @@ const EventList = () => {
         const fetchData = async () => {
             const db = getFirestore();
             const eventsCollection = collection(db, 'events');
+            const eventsQuery = query(eventsCollection, orderBy('createdAt', 'desc'));
             const querySnapshot = await getDocs(eventsCollection);
 
             const eventData = [];

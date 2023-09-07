@@ -32,15 +32,20 @@ const EventDetails = () => {
         return <div>Event Not Found</div>;
     }
 
+    const eventDate = new Date(event.eventDateTime);
+    const formattedDate = `${eventDate.toDateString()},`;
+    const formattedTime = `${eventDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
     return (
         <div className="event-details-container">
             <img src={event.eventImage} alt={event.eventName} className="event-details-image" />
             <div className="event-details-content">
-                <h2>Name: {event.eventName}</h2>
-                <p>Description: {event.eventDescription}</p>
-                <p>Date & Time: {event.eventDateTime}</p>
-                <p>Mode: {event.mode}</p>
-                <p>Venue: {event.venue}</p>
+                <h2>{event.eventName}</h2>
+                <p><b>Description:</b> {event.eventDescription}</p>
+                <p><b>Date:</b> {formattedDate} <b>Time:</b> {formattedTime}</p>
+                <p><b>Mode:</b> {event.mode}</p>
+                <p><b>Meeting Link:</b> <a href={event.onlineMeetLink} target="_blank" style={{ textDecoration: "none" }} rel="noopener noreferrer">{event.onlineMeetLink}</a></p>
+                <p><b>Venue:</b> {event.venue}</p>
                 <button onClick={handleNotifyClick} className="notify-button">
                     Notify
                 </button>
