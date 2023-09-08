@@ -72,7 +72,7 @@ function App() {
                     </div>
                 </nav>
                 <Routes>
-                    <Route path="/" element={<EventViewer />} />
+                    <Route path="/" element={user ? <EventViewer /> : <Navigate to="/login" />} />
                     <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
                     <Route path="/signup" element={user ? <Navigate to="/" /> : <Signup />} />
                     <Route path="/event/:eventId" element={<EventDetails />} />
