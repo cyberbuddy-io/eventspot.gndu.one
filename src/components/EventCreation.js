@@ -9,6 +9,7 @@ const EventCreation = () => {
     const [eventDateTime, setEventDateTime] = useState('');
     const [eventImage, setEventImage] = useState(null);
     const [eventVenue, setEventVenue] = useState('');
+    const [registrationLink, setRegistrationLink] = useState('');
     const [eventMode, setEventMode] = useState('Online');
     const [onlineMeetLink, setOnlineMeetLink] = useState('');
     const [message, setMessage] = useState('');
@@ -37,9 +38,10 @@ const EventCreation = () => {
                     eventDescription,
                     eventDateTime,
                     eventImage: imageUrl,
+                    registrationLink,
                     onlineMeetLink: eventMode === 'Online' ? onlineMeetLink : '',
-                    venue: eventMode === 'Offline' ? eventVenue : '', // Store venue conditionally
-                    mode: eventMode, // Store event mode
+                    venue: eventMode === 'Offline' ? eventVenue : '',
+                    mode: eventMode,
                 };
 
                 const docRef = await addDoc(eventsCollection, newEvent);
@@ -49,6 +51,7 @@ const EventCreation = () => {
             setEventDescription('');
             setEventDateTime('');
             setEventImage(null);
+            setRegistrationLink('');
             setOnlineMeetLink('');
             setEventVenue('');
             setMessage('Event created successfully!');
@@ -111,6 +114,20 @@ const EventCreation = () => {
                         id="eventImage"
                         className="event-creation-input"
                         onChange={handleImageChange}
+                        required
+                    />
+                </div>
+                <div className="event-creation-group">
+                    <label htmlFor="registrationLink" className="event-creation-label">
+                        Registration Link
+                    </label>
+                    <input
+                        type="text"
+                        id="registrationLink"
+                        placeholder='Enter registration link'
+                        className="event-creation-input"
+                        value={registrationLink}
+                        onChange={(e) => setRegistrationLink(e.target.value)}
                         required
                     />
                 </div>

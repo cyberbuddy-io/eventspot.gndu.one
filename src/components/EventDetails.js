@@ -24,7 +24,6 @@ const EventDetails = () => {
     }, [eventId]);
 
     const handleNotifyClick = () => {
-        // Implement the notification logic here, e.g., send a notification to the user.
         alert('You will be notified about this event.');
     };
 
@@ -49,6 +48,11 @@ const EventDetails = () => {
                 <button onClick={handleNotifyClick} className="notify-button">
                     Notify
                 </button>
+                
+                <a href={event.registrationLink} target="_blank" style={{ textDecoration: 'none', margin: '20px' }} rel="noopener noreferrer">
+                    <button className="register-button">Register here</button>
+                </a>
+                
             </div>
         </div>
     );
