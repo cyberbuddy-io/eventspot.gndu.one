@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, getDocs, query, orderBy } from 'firebase/firestore';
 import EventCard from './EventCard';
+import '../App.css';
+import Pagination from './Pagination';
 import styled from 'styled-components';
 
 // Define your styled components
@@ -16,8 +18,8 @@ const EventViewerContainer = styled.div`
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 15px;
-    margin-left: 80px;
+    gap: 50px;
+    margin-left: 70px;
 `;
 
 const EventCardContainer = styled.div`
@@ -33,14 +35,20 @@ const StyledHeading = styled.h2`
     padding-top: 30px;
 `;
 
+const EventsPerPage = 3; // Number of events per page
+
 const EventList = () => {
     const [events, setEvents] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
         const fetchData = async () => {
             const db = getFirestore();
             const eventsCollection = collection(db, 'events');
-            const eventsQuery = query(eventsCollection, orderBy('createdAt', 'desc'));
+            const eventsQuery = query(
+                eventsCollection,
+                orderBy('createdAt', 'desc')
+            );
             const querySnapshot = await getDocs(eventsCollection);
 
             const eventData = [];
@@ -54,16 +62,32 @@ const EventList = () => {
         fetchData();
     }, []);
 
+    // Calculate the current events to display based on pagination
+    const indexOfLastEvent = currentPage * EventsPerPage;
+    const indexOfFirstEvent = indexOfLastEvent - EventsPerPage;
+    const currentEvents = events.slice(indexOfFirstEvent, indexOfLastEvent);
+
+    // Handle page change
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
     return (
         <CenteredContent>
             <StyledHeading>GNDU Event Listing</StyledHeading>
             <EventViewerContainer>
-                {events.map((event) => (
+                {currentEvents.map((event) => (
                     <EventCardContainer key={event.id}>
                         <EventCard event={event} />
                     </EventCardContainer>
                 ))}
             </EventViewerContainer>
+            <Pagination
+                eventsPerPage={EventsPerPage}
+                totalEvents={events.length}
+                currentPage={currentPage}
+                onPageChange={handlePageChange}
+            />
         </CenteredContent>
     );
 };
